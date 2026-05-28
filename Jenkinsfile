@@ -2,16 +2,16 @@ pipeline {
     agent any
 
     environment {
-    IMAGE_NAME = "treeo2-api"
-    CONTAINER_NAME = "treeo2-production"
-    PYTHON_EXE = "C:\\Users\\Admin\\treeo2-devops\\venv\\Scripts\\python.exe"
-}
+        IMAGE_NAME = "treeo2-api"
+        CONTAINER_NAME = "treeo2-production"
+        PYTHON_EXE = "C:\\Users\\Admin\\treeo2-devops\\venv\\Scripts\\python.exe"
+    }
 
     stages {
         stage('Build') {
             steps {
                 echo 'Stage 1: Installing dependencies and building Docker image'
-                bat 'py -m pip install -r requirements.txt'
+                bat '"%PYTHON_EXE%" -m pip install -r requirements.txt'
                 bat 'docker build -t %IMAGE_NAME% .'
             }
         }
@@ -19,21 +19,21 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Stage 2: Running automated API tests using pytest'
-                bat 'py -m pytest tests'
+                bat '"%PYTHON_EXE%" -m pytest tests'
             }
         }
 
         stage('Code Quality') {
             steps {
                 echo 'Stage 3: Checking Python code quality'
-                bat 'py -m compileall app'
+                bat '"%PYTHON_EXE%" -m compileall app'
             }
         }
 
         stage('Security') {
             steps {
                 echo 'Stage 4: Running Bandit security scan'
-                bat 'py -m bandit -r app || exit 0'
+                bat '"%PYTHON_EXE%" -m bandit -r app || exit 0'
             }
         }
 
