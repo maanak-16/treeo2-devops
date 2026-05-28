@@ -11,8 +11,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'Stage 1: Installing dependencies and building Docker image'
-                bat '"%PYTHON_EXE%" -m pip install --no-input --disable-pip-version-check -r requirements.txt'
+                echo 'Stage 1: Building Docker image'
                 bat '"%DOCKER_EXE%" build -t %IMAGE_NAME% .'
             }
         }
