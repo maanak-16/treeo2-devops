@@ -2,9 +2,10 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "treeo2-api"
-        CONTAINER_NAME = "treeo2-production"
-    }
+    IMAGE_NAME = "treeo2-api"
+    CONTAINER_NAME = "treeo2-production"
+    PYTHON_EXE = "C:\\Users\\Admin\\treeo2-devops\\venv\\Scripts\\python.exe"
+}
 
     stages {
         stage('Build') {
