@@ -5,6 +5,7 @@ pipeline {
         IMAGE_NAME = "treeo2-api"
         CONTAINER_NAME = "treeo2-production"
         PYTHON_EXE = "C:\\Users\\Admin\\treeo2-devops\\venv\\Scripts\\python.exe"
+        DOCKER_EXE = "C:\\Users\\Admin\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe"
     }
 
     stages {
@@ -12,7 +13,7 @@ pipeline {
             steps {
                 echo 'Stage 1: Installing dependencies and building Docker image'
                 bat '"%PYTHON_EXE%" -m pip install -r requirements.txt'
-                bat 'docker build -t %IMAGE_NAME% .'
+                bat '"%DOCKER_EXE%" build -t %IMAGE_NAME% .'
             }
         }
 
@@ -40,15 +41,15 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Stage 5: Deploying application container'
-                bat 'docker rm -f %CONTAINER_NAME% || exit 0'
-                bat 'docker run -d --name %CONTAINER_NAME% -p 8000:8000 %IMAGE_NAME%'
+                bat '"%DOCKER_EXE%" rm -f %CONTAINER_NAME% || exit 0'
+                bat '"%DOCKER_EXE%" run -d --name %CONTAINER_NAME% -p 8000:8000 %IMAGE_NAME%'
             }
         }
 
         stage('Release') {
             steps {
-                echo 'Stage 6: Creating release tag'
-                bat 'docker tag %IMAGE_NAME% %IMAGE_NAME%:release-%BUILD_NUMBER%'
+                echo 'Stage 6: Creating release image tag'
+                bat '"%DOCKER_EXE%" tag %IMAGE_NAME% %IMAGE_NAME%:release-%BUILD_NUMBER%'
             }
         }
 
