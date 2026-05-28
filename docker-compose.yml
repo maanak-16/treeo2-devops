@@ -1,0 +1,8 @@
+version: "3.8"
+
+services:
+  treeo2-api:
+    build: .
+    container_name: treeo2-api
+    ports:
+      - "8000:8000"
