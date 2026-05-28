@@ -9,53 +9,54 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'Stage 1: Building Docker image for TreeO2 Backend API'
-                bat 'docker build -t %IMAGE_NAME% .'
+                echo 'Stage 1: Installing dependencies and building Docker image'
+                sh 'python3 -m pip install -r requirements.txt'
+                sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Stage 2: Running automated API tests using pytest'
-                bat 'python -m pytest tests'
+                sh 'python3 -m pytest tests'
             }
         }
 
         stage('Code Quality') {
             steps {
-                echo 'Stage 3: Running Python compile check as code quality validation'
-                bat 'python -m compileall app'
+                echo 'Stage 3: Checking Python code quality'
+                sh 'python3 -m compileall app'
             }
         }
 
         stage('Security') {
             steps {
                 echo 'Stage 4: Running Bandit security scan'
-                bat 'bandit -r app || exit 0'
+                sh 'bandit -r app || true'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'Stage 5: Deploying TreeO2 API container'
-                bat 'docker rm -f %CONTAINER_NAME% || exit 0'
-                bat 'docker run -d --name %CONTAINER_NAME% -p 8000:8000 %IMAGE_NAME%'
+                echo 'Stage 5: Deploying application container'
+                sh 'docker rm -f $CONTAINER_NAME || true'
+                sh 'docker run -d --name $CONTAINER_NAME -p 8000:8000 $IMAGE_NAME'
             }
         }
 
         stage('Release') {
             steps {
-                echo 'Stage 6: Creating release image tag'
-                bat 'docker tag %IMAGE_NAME% %IMAGE_NAME%:release-%BUILD_NUMBER%'
-                echo 'Release created successfully'
+                echo 'Stage 6: Creating release tag'
+                sh 'docker tag $IMAGE_NAME $IMAGE_NAME:release-$BUILD_NUMBER'
             }
         }
 
         stage('Monitoring') {
             steps {
-                echo 'Stage 7: Monitoring deployed application using health and metrics endpoints'
-                bat 'curl http://localhost:8000/health'
-                bat 'curl http://localhost:8000/metrics'
+                echo 'Stage 7: Checking health and metrics endpoints'
+                sh 'sleep 5'
+                sh 'curl http://localhost:8000/health'
+                sh 'curl http://localhost:8000/metrics'
             }
         }
     }
@@ -66,7 +67,7 @@ pipeline {
         }
 
         failure {
-            echo 'TreeO2 DevOps pipeline failed. Check console output.'
+            echo 'TreeO2 DevOps pipeline failed.'
         }
     }
 }
