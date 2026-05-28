@@ -9,30 +9,29 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'Stage 1: Installing dependencies and building Docker image'
-                sh 'python3 -m pip install -r requirements.txt'
+                echo 'Stage 1: Building Docker image'
                 sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Stage 2: Running automated API tests using pytest'
-                sh 'python3 -m pytest tests'
+                echo 'Stage 2: Running tests inside Docker container'
+                sh 'docker run --rm $IMAGE_NAME pytest tests'
             }
         }
 
         stage('Code Quality') {
             steps {
-                echo 'Stage 3: Checking Python code quality'
-                sh 'python3 -m compileall app'
+                echo 'Stage 3: Running code quality compile check inside Docker'
+                sh 'docker run --rm $IMAGE_NAME python -m compileall app'
             }
         }
 
         stage('Security') {
             steps {
-                echo 'Stage 4: Running Bandit security scan'
-                sh 'bandit -r app || true'
+                echo 'Stage 4: Running Bandit security scan inside Docker'
+                sh 'docker run --rm $IMAGE_NAME bandit -r app || true'
             }
         }
 
